@@ -246,7 +246,7 @@ class ProxyManager:
     
     # Common free proxy aggregators that return raw text lines
     PROXY_SOURCES = [
-        "http://spys.ly/socks5/free", 
+        "http://spys.ly/socks4/free", 
         "http://proxylist.georosso.com/?nohttp=1&nossh=0&nocustomport=1&nocountryfilter=1&sni=true" 
     ]
 
