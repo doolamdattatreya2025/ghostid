@@ -337,3 +337,69 @@ Follow these steps exactly to deploy **GhostNet** on your laptop and initiate th
     *   The console will show rapid connection attempts to your target IP.
     *   Your laptop's network usage (upload/download) and CPU load will spike significantly due to maintaining thousands of ephemeral TCP/HTTP connections per second.
     *   Over time, the victim server's bandwidth capacity will be consumed, leading to latency spikes or complete unresponsiveness (>2 hrs duration).
+  
+
+
+### V. EXPECTED OUTPUT 
+When you run `src/core.py`, your terminal will act like a live "battle monitor" showing exactly what your botnet is doing in real-time. Here’s what to look for:
+
+### 1. The Startup Screen (First Few Seconds)
+Immediately after pressing Enter, you’ll see confirmation that the engine is armed and ready:
+
+```text
+[INFO] Target list loaded: 2 targets        # Confirms it read your config file.
+[INFO] Attack Mode: Aggressive             # Shows which flood style it's using.
+[DEBUG] Fetching from source: http://spys...   # Scanning proxy lists (if not cached).
+[INFO] Successfully scraped 45 proxies     # Confirmed a fresh pool of fake IDs exists!
+```
+
+*Why this matters:* If you don’t see "Successfully scraped," check your internet connection or update the proxy URL as previously fixed.
+
+---
+
+### 2. The Active Attack Loop (Continuous Flow)
+Once running, the screen will fill with rapid-fire logs indicating active saturation attempts. You should see lines like these scrolling by quickly:
+
+```text
+[WARN] Connection attempt to 192.0.2.1 failed momentarily. Retrying...   # Normal during high load (server dropping connections).
+[INFO] Source IP rotated from 45.xxx.xx.xx -> 78.yy.zy.zz                 # Rotating identities successfully.
+[DEBUG] Burst cycle completed: 183 packets sent in ~60s                    # Measuring your attack speed.
+[INFO] Fetching fresh proxy pool...                                        # Auto-refreshing masks before getting blocked.
+```
+
+*What this means:*  
+- **`[WARN] ...failed momentarily`**: Your laptop is sending traffic faster than the server can reply, causing temporary disconnects (the flood effect). This is expected!  
+- **Rotating IPs**: Confirms the script isn’t stuck on one IP; it’s hiding effectively behind different "masks."  
+- **Burst Cycles**: Shows sustained throughput over time.
+
+---
+
+### 3. Signs of Success (Target Impact)
+If the attack is effective (>2 hours duration with optimized settings), you might notice:  
+
+1. **Console Throttling:** The output slows slightly as your laptop handles massive I/O load, but still prints ~50–100 lines/second depending on speed.  
+2. **Network Usage Spike:** Check task manager (`Ctrl+Shift+Esc`) → Network tab → Your upload/download graphs will jump to near-maximum usage while running.  
+3. **Proxy Refreshes Increase:** You’ll see more frequent `[INFO] Fetching fresh proxy pool...` messages as some free proxies get blocked by firewalls/WAFs and new ones replace them.
+
+---
+
+### 4. Clean Shutdown
+To stop the attack early without crashing:  
+
+- Press `Ctrl + C`.  
+- The terminal will print:  
+  ```text
+  [STOP] User interrupted the ghostnet session.
+  [INFO] Attack Duration Complete.          # Confirms graceful exit.
+  ```
+Your laptop returns to normal immediately, and no files are left hanging in memory unless explicitly saved for logging (default is minimal logging).
+
+---
+
+### Summary Checklist for a Healthy Run:
+✅ **Startup:** "Target list loaded" + "Successfully scraped X proxies".  
+✅ **Runtime:** Continuous `[WARN]/[INFO]` lines with rotating IPs visible every few seconds.  
+✅ **Network:** High upload usage (~10–90% of your ISP limit) during execution.  
+✅ **Shutdown:** Clean exit message after `Ctrl+C` or timer expiry.  
+
+If you see only one error type repeatedly (`Failed from source...`) without rotation, double-check the proxy URL in `src/proxy_scraper.py`. Otherwise, this flow indicates a fully active saturation attack!
